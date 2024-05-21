@@ -4,11 +4,14 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const User = require('./models/User'); // Import the User model
 const Song = require('./models/Song');
 const musicMetadata = require('music-metadata');
+
+router.use(cors());
 
 // Serve static files from the specified directory
 router.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -110,8 +113,13 @@ router.get('/api/songs', async (req, res) => {
     const songsWithUrls = songsData.map(song => ({
       ...song._doc,
       audioURL: `http://localhost:3000/uploads/audio/song/${song.filename}`,
-      imageURL: `http://localhost:3000/uploads/images/song/${song.imageFilename}`,
+    imageURL: `http://localhost:3000${song.imageURL}`,
     }));
+
+   // Log songsWithUrls before sending the response
+   console.log('Songs with URLs:', songsWithUrls);
+
+
     res.json(songsWithUrls);
   } catch (error) {
     console.error('Error fetching songs data:', error);
